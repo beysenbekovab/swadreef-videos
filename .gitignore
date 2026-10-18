@@ -1,0 +1,4 @@
+reels/*/src/stills/
+reels/*/src/mix.wav
+reels/*/src/mix_raw.wav
+node_modules/

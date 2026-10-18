@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Qamar — Мусхаф</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  /* Токены приложения: тёмный фон ночной темы, лаванда — Qamar, золото — аят/Коран */
+  :root {
+    --bg: #0E0D12;
+    --bg-hi: #1F1B3A;
+    --lav: #B5A5F0;
+    --lav-deep: #6C5EC0;
+    --gold: #D9A441;
+    --text: #F6F1E7;
+    --muted: rgba(246, 241, 231, .62);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+  body { font-family: 'Manrope', sans-serif; color: var(--text); }
+  .a { position: absolute; opacity: 0; will-change: opacity, transform; }
+  .c { left: 0; right: 0; text-align: center; }
+
+  #bg { position: absolute; inset: -40px; background: radial-gradient(110% 60% at 50% 22%, var(--bg-hi) 0%, var(--bg) 62%); }
+  #fx { position: absolute; inset: 0; }
+
+  /* хук */
+  #moon { top: 470px; left: 455px; width: 170px; height: 170px; }
+  #kicker { top: 690px; font-size: 30px; letter-spacing: .32em; font-weight: 700; color: var(--lav); }
+  .tl { top: 0; font-size: 96px; line-height: 1; font-weight: 800; letter-spacing: -.02em; white-space: nowrap; }
+  .tl em { font-style: normal; color: var(--lav); }
+  #t1 { top: 760px; } #t2 { top: 866px; }
+  #hsub { top: 1010px; font-size: 36px; color: var(--muted); font-weight: 500; }
+
+  /* подписи сцен — внутри безопасной зоны 200–1500 px, без правого края */
+  .cap-n { left: 80px; top: 236px; display: flex; align-items: center; gap: 14px;
+    font-size: 26px; font-weight: 800; letter-spacing: .18em; color: var(--lav); }
+  .cap-n::before { content: ''; width: 46px; height: 3px; background: currentColor; border-radius: 2px; }
+  .cap-h { left: 80px; top: 282px; font-size: 76px; font-weight: 800; letter-spacing: -.02em; line-height: 1.05; }
+  .cap-s { left: 82px; top: 380px; font-size: 34px; font-weight: 500; color: var(--muted); }
+
+  /* iPad */
+  #ipad { left: 160px; top: 520px; width: 760px; height: 1023px; transform-origin: 50% 50%; }
+  #ipad .body { position: absolute; inset: 0; border-radius: 56px; background: linear-gradient(145deg,#2f2b40,#0d0c14);
+    padding: 22px; box-shadow: 0 60px 120px rgba(0,0,0,.6), 0 0 0 2px rgba(255,255,255,.07) inset; }
+  #screen { position: relative; width: 100%; height: 100%; border-radius: 36px; overflow: hidden; background: #FFF7E8; }
+  #screen img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; opacity: 0; }
+  #dim { position: absolute; inset: 0; background: #07060c; opacity: 0; }
+  #tap { width: 110px; height: 110px; margin: -55px 0 0 -55px; z-index: 5; }
+  #tap .dot { position: absolute; inset: 25px; border-radius: 50%; background: rgba(108,94,192,.55);
+    box-shadow: 0 0 0 4px rgba(255,255,255,.92), 0 6px 24px rgba(0,0,0,.25); }
+  #tap .ring { position: absolute; inset: 0; border-radius: 50%; border: 4px solid rgba(108,94,192,.9); }
+
+  /* линза: увеличенный фрагмент экрана, вылетающий из iPad */
+  .lens { border-radius: 30px; overflow: hidden; transform-origin: 0 0;
+    box-shadow: 0 40px 90px rgba(0,0,0,.55), 0 0 0 3px var(--ring, rgba(181,165,240,.0)); }
+  .lens img { position: absolute; display: block; }
+
+  /* финал */
+  #logo { top: 470px; left: 465px; width: 150px; height: 150px; }
+  #brand { top: 650px; font-size: 136px; font-weight: 800; letter-spacing: -.03em; }
+  #csub { top: 820px; font-size: 38px; color: var(--muted); font-weight: 500; }
+  .plat { left: 170px; width: 740px; height: 112px; border-radius: 28px; display: flex; align-items: center; gap: 22px;
+    padding: 0 34px; background: rgba(181,165,240,.12); box-shadow: 0 0 0 2px rgba(181,165,240,.35) inset; font-size: 36px; font-weight: 700; }
+  .plat b { color: var(--lav); font-weight: 800; }
+  .plat span { color: var(--muted); font-weight: 600; width: 160px; }
+  #p1 { top: 940px; } #p2 { top: 1076px; }
+  #handle { top: 1240px; font-size: 30px; color: var(--muted); font-weight: 600; }
+
+  #dots { left: 0; right: 0; top: 1600px; display: flex; justify-content: center; gap: 14px; }
+  #dots i { width: 14px; height: 14px; border-radius: 7px; background: rgba(246,241,231,.25); }
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<canvas id="fx" width="1080" height="1920"></canvas>
+
+<svg id="moon" class="a" viewBox="0 0 100 100">
+  <defs><mask id="cres"><rect width="100" height="100" fill="#fff"/><circle id="moon-cut" cx="110" cy="38" r="36" fill="#000"/></mask></defs>
+  <circle cx="50" cy="50" r="40" fill="#B5A5F0" mask="url(#cres)"/>
+</svg>
+<div id="kicker" class="a c">QAMAR · МУСХАФ</div>
+<div id="t1" class="a c tl">Коран, который</div>
+<div id="t2" class="a c tl">хочется <em>открывать</em></div>
+<div id="hsub" class="a c">5 возможностей мусхафа в Qamar</div>
+
+<div id="caps"></div>
+
+<div id="ipad" class="a">
+  <div class="body"><div id="screen">
+    <img id="L-page-zoom" src="shots/1-page-zoom.jpg">
+    <img id="L-page" src="shots/2-page.jpg">
+    <img id="L-card-top" src="shots/3-ayah-card.jpg">
+    <img id="L-card" src="shots/3-ayah-card.jpg">
+    <img id="L-audio-top" src="shots/4-audio.jpg">
+    <img id="L-player" src="shots/4-audio.jpg">
+    <img id="L-night" src="shots/5-night.jpg">
+    <img id="L-note-top" src="shots/6-note.jpg">
+    <img id="L-note-sheet" src="shots/6-note.jpg">
+    <div id="dim"></div>
+    <div id="tap" class="a"><div class="ring"></div><div class="dot"></div></div>
+  </div></div>
+</div>
+
+<div id="lenses"></div>
+
+<svg id="logo" class="a" viewBox="0 0 100 100">
+  <defs><mask id="cres2"><rect width="100" height="100" fill="#fff"/><circle cx="66" cy="38" r="36" fill="#000"/></mask></defs>
+  <circle cx="50" cy="50" r="40" fill="#B5A5F0" mask="url(#cres2)"/>
+</svg>
+<div id="brand" class="a c">Qamar</div>
+<div id="csub" class="a c">Мусхаф всегда с тобой</div>
+<div id="p1" class="a plat"><span>iPhone</span><b>qamar.web.app</b></div>
+<div id="p2" class="a plat"><span>Android</span><b>Google Play</b></div>
+<div id="handle" class="a c">Ссылка в профиле ↑</div>
+
+<div id="dots" class="a"></div>
+
+<script>
+(async () => {
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const ramp = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, k) => a + (b - a) * k;
+const eo = u => 1 - (1 - u) ** 3;                                            // появление
+const eio = u => u < .5 ? 4 * u ** 3 : 1 - (-2 * u + 2) ** 3 / 2;           // перелёты
+const eback = u => { const c = 1.6; return 1 + (c + 1) * (u - 1) ** 3 + c * (u - 1) ** 2; };
+const win = (t, a, b, fi = .35, fo = .3) => clamp((t - a) / fi) * clamp((b - t) / fo);   // жизнь элемента
+const up = (t, a, d = 18) => d * (1 - eo(ramp(t, a, a + .5)));                 // подъём при появлении
+function S(el, o, x = 0, y = 0, s = 1) {
+  el = typeof el === 'string' ? $(el) : el;
+  el.style.opacity = o.toFixed(3);
+  el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px) scale(${s.toFixed(4)})`;
+}
+
+const TL = await (await fetch('timeline.json')).json(), M = TL.marks;
+window.TLDUR = TL.duration;
+
+/* ---------- Сцены ---------- */
+const SCENES = [
+  { a: M.s1, b: M.s1End, h: 'Цветовой таджвид', s: 'правила чтения видны прямо в тексте' },
+  { a: M.s2, b: M.s2End, h: 'Нажми на аят', s: 'транскрипция и перевод' },
+  { a: M.s3, b: M.s3End, h: 'Слушай чтеца', s: 'аят подсвечивается во время чтения' },
+  { a: M.s4, b: M.s4End, h: 'Ночная тема', s: 'мягкий тёмный экран для вечера' },
+  { a: M.s5, b: M.s5End, h: 'Заметки к аятам', s: 'закладки, избранное и свои мысли' },
+];
+$('caps').innerHTML = SCENES.map((c, i) =>
+  `<div id="cn${i}" class="a cap-n">${String(i + 1).padStart(2, '0')}</div>` +
+  `<div id="ch${i}" class="a cap-h">${c.h}</div><div id="cs${i}" class="a cap-s">${c.s}</div>`).join('');
+$('dots').innerHTML = '<i></i>'.repeat(SCENES.length);
+
+/* ---------- Линзы: область скриншота (px исходника 1640×2242) → цель на сцене ---------- */
+const SRC_W = 1640, SCR = { x: 182, y: 542, w: 716 }, K = SCR.w / SRC_W;   // экран iPad на сцене
+const LENSES = [
+  { src: 'shots/1-page-zoom.jpg', r: [440, 195, 1215, 395], W: 980, top: 640, up: M.lens1Up, back: M.lens1Back, ring: '217,164,65' },
+  { src: 'shots/3-ayah-card.jpg', r: [388, 1828, 1252, 2172], W: 960, top: 600, up: M.lens2Up, back: M.lens2Back, ring: '181,165,240' },
+  { src: 'shots/4-audio.jpg', r: [0, 1895, 1640, 2242], W: 980, top: 680, up: M.lens3Up, back: M.lens3Back, ring: '181,165,240' },
+  { src: 'shots/6-note.jpg', r: [270, 935, 1370, 1385], W: 960, top: 620, up: M.lens5Up, back: M.lens5Back, ring: '181,165,240' },
+];
+$('lenses').innerHTML = LENSES.map((L, i) => {
+  const [x0, y0, x1, y1] = L.r, z = L.W / (x1 - x0);
+  L.H = (y1 - y0) * z;
+  return `<div id="lens${i}" class="a lens" style="left:${(1080 - L.W) / 2}px;top:${L.top}px;width:${L.W}px;height:${L.H}px">` +
+    `<img src="${L.src}" style="width:${SRC_W * z}px;left:${-x0 * z}px;top:${-y0 * z}px"></div>`;
+}).join('');
+
+function lens(t, i) {
+  const L = LENSES[i], el = $('lens' + i), [x0, y0, x1] = L.r;
+  // старт: точная позиция фрагмента внутри экрана iPad
+  const sx = SCR.x + x0 * K, sy = SCR.y + y0 * K, ss = (x1 - x0) * K / L.W;
+  const tx = (1080 - L.W) / 2, ty = L.top;
+  const kUp = eio(ramp(t, L.up, L.up + .7)), kBack = eio(ramp(t, L.back, L.back + .6));
+  const k = kUp * (1 - kBack);
+  const vis = t >= L.up && t < L.back + .6 ? 1 : 0;
+  // чуть приподнять дугой в середине перелёта
+  const arc = -40 * Math.sin(Math.PI * k);
+  S(el, vis, lerp(sx - tx, 0, k), lerp(sy - ty, 0, k) + arc, lerp(ss, 1, k));
+  el.style.setProperty('--ring', `rgba(${L.ring},${(.85 * k).toFixed(3)})`);
+  return k;
+}
+
+/* ---------- Слои экрана ---------- */
+const layer = (id, o, top = 0, bottom = 100, dy = 0) => {
+  const el = $('L-' + id);
+  el.style.opacity = o.toFixed(3);
+  el.style.transform = `translateY(${dy.toFixed(2)}%)`;
+  el.style.clipPath = `inset(${top}% 0 ${100 - bottom}% 0)`;
+};
+
+/* ---------- Фон: сидовые звёзды (mulberry32) ---------- */
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
+  t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const rnd = mulberry32(1405);
+const STARS = Array.from({ length: 140 }, () => ({ x: rnd() * 1080, y: rnd() * 1960, r: .6 + rnd() * 1.9, ph: rnd() * 6.28, sp: .5 + rnd() * 1.5 }));
+const SPARKS = Array.from({ length: 26 }, () => ({ x: rnd() * 1080, y: rnd() * 1920, v: 6 + rnd() * 10, ph: rnd() * 6.28 }));
+const fx = $('fx').getContext('2d');
+function drawFx(t) {
+  fx.clearRect(0, 0, 1080, 1920);
+  const drift = -t;                                         // ≈ −10 px за 10 с
+  for (const s of STARS) {
+    fx.globalAlpha = .18 + .5 * (.5 + .5 * Math.sin(t * s.sp + s.ph));
+    fx.fillStyle = '#fff';
+    fx.beginPath(); fx.arc(s.x, ((s.y + drift) % 1960 + 1960) % 1960 - 20, s.r, 0, 6.283); fx.fill();
+  }
+  for (const p of SPARKS) {                                 // медленно поднимающиеся лавандовые искры
+    const y = ((p.y - t * p.v) % 1920 + 1920) % 1920;
+    fx.globalAlpha = .25 * (.5 + .5 * Math.sin(t * 1.3 + p.ph));
+    fx.fillStyle = '#B5A5F0';
+    fx.beginPath(); fx.arc(p.x + 6 * Math.sin(t * .4 + p.ph), y, 2.2, 0, 6.283); fx.fill();
+  }
+  fx.globalAlpha = 1;
+}
+
+await document.fonts.load('800 60px Manrope'); await document.fonts.load('500 60px Manrope');
+await document.fonts.ready;
+await Promise.all([...document.images].map(i => i.decode().catch(() => {})));
+
+/* ---------- Кадр: только функция от t ---------- */
+window.render = t => {
+  drawFx(t);
+  $('bg').style.transform = `translateY(${(-t * .8).toFixed(1)}px)`;
+
+  // хук: луна прорисовывается, строки заголовка заходят волной
+  const hk = win(t, 0, M.hookOut + .3, .5, .35);
+  S('moon', hk * ramp(t, M.moon, M.moon + .4), 0, up(t, M.moon, 24), 1);
+  $('moon-cut').setAttribute('cx', lerp(110, 66, eo(ramp(t, M.moon, M.moon + 1.2))).toFixed(2));
+  S('kicker', hk * ramp(t, M.title - .1, M.title + .3), 0, up(t, M.title - .1));
+  S('t1', hk * ramp(t, M.title, M.title + .4), 0, up(t, M.title, 24));
+  S('t2', hk * ramp(t, M.title + .07, M.title + .47), 0, up(t, M.title + .07, 24));
+  S('hsub', hk * ramp(t, M.title + .5, M.title + .9), 0, up(t, M.title + .5));
+
+  // iPad: поднимается из-под кадра, уходит вниз к финалу
+  const inK = eo(ramp(t, M.ipadIn, M.ipadIn + .9)), outK = eio(ramp(t, M.ipadOut, M.ipadOut + .7));
+  S('ipad', t >= M.ipadIn && t < M.ipadOut + .7 ? 1 : 0, 0, (1 - inK) * 1250 + outK * 1300, lerp(1, .86, outK));
+
+  // подписи сцен: подъём + стаггер, перекрытие соседних сцен
+  SCENES.forEach((c, i) => {
+    const o = win(t, c.a + .1, c.b, .4, .3);
+    S('cn' + i, o, 0, up(t, c.a + .1));
+    S('ch' + i, o * ramp(t, c.a + .16, c.a + .5), 0, up(t, c.a + .16, 22));
+    S('cs' + i, o * ramp(t, c.a + .23, c.a + .6), 0, up(t, c.a + .23));
+  });
+  const active = t >= M.s1 && t < M.s5End;
+  const fi = SCENES.findIndex(c => t >= c.a && t < c.b);
+  S('dots', win(t, M.s1, M.s5End));
+  [...$('dots').children].forEach((d, i) => {
+    d.style.width = i === fi ? '44px' : '14px';
+    d.style.background = i === fi ? 'var(--lav)' : (active && i < fi ? 'rgba(181,165,240,.5)' : 'rgba(246,241,231,.25)');
+  });
+
+  // экран: состояния приложения сменяются движениями самого приложения
+  layer('page-zoom', 1);
+  layer('page', eo(ramp(t, M.s2 - .3, M.s2 + .1)));
+  layer('card-top', eo(ramp(t, M.card - .05, M.card + .2)), 0, 80);
+  const ck = eo(ramp(t, M.card, M.card + .5));
+  layer('card', ck > 0 ? 1 : 0, 80, 100, (1 - ck) * 22);
+  layer('audio-top', eo(ramp(t, M.player - .1, M.player + .3)), 0, 84.5);
+  const pk = eo(ramp(t, M.player, M.player + .5));
+  layer('player', pk > 0 ? 1 : 0, 84.5, 100, (1 - pk) * 16);
+  const nk = eio(ramp(t, M.night, M.night + .9));
+  $('L-night').style.opacity = nk > 0 ? 1 : 0;
+  $('L-night').style.clipPath = `circle(${(nk * 135).toFixed(2)}% at 92% 4%)`;
+  layer('note-top', eo(ramp(t, M.sheet - .1, M.sheet + .25)), 0, 34.5);
+  const sk = eo(ramp(t, M.sheet, M.sheet + .55));
+  layer('note-sheet', sk > 0 ? 1 : 0, 34, 100, (1 - sk) * 70);
+
+  // касания
+  let tapShown = false;
+  for (const [at, x, y] of [[M.tap2, 63.7, 36.7], [M.tap5, 63.7, 36.7]]) {
+    if (t < at - .45 || t > at + .7) continue;
+    tapShown = true;
+    const tap = $('tap');
+    tap.style.left = x + '%'; tap.style.top = y + '%';
+    S(tap, eo(ramp(t, at - .45, at - .1)) * (1 - ramp(t, at + .4, at + .7)), 0, up(t, at - .45, 40));
+    const press = ramp(t, at, at + .15), ring = ramp(t, at, at + .55);
+    S(tap.querySelector('.dot'), 1, 0, 0, 1 - .2 * Math.sin(Math.PI * press));
+    S(tap.querySelector('.ring'), t >= at ? 1 - ring : 0, 0, 0, .5 + ring * .9);
+  }
+  if (!tapShown) S('tap', 0);
+
+  // линзы + затемнение экрана под ними
+  let dim = 0;
+  LENSES.forEach((_, i) => { dim = Math.max(dim, lens(t, i)); });
+  $('dim').style.opacity = (dim * .55).toFixed(3);
+
+  // финал
+  const cta = M.cta;
+  S('logo', ramp(t, cta, cta + .4), 0, up(t, cta, 24), lerp(.8, 1, eback(ramp(t, cta, cta + .6))));
+  S('brand', ramp(t, cta + .1, cta + .5), 0, up(t, cta + .1, 24));
+  S('csub', ramp(t, cta + .2, cta + .6), 0, up(t, cta + .2));
+  S('p1', ramp(t, cta + .45, cta + .85), 0, up(t, cta + .45, 22));
+  S('p2', ramp(t, cta + .52, cta + .92), 0, up(t, cta + .52, 22));
+  S('handle', ramp(t, cta + .8, cta + 1.2), 0, up(t, cta + .8));
+};
+
+window.render(0);
+window.READY = true;
+if (location.search.includes('play')) {
+  const t0 = performance.now();
+  const loop = () => { window.render(((performance.now() - t0) / 1000) % TL.duration); requestAnimationFrame(loop); };
+  loop();
+}
+})();
+</script>
+</body>
+</html>

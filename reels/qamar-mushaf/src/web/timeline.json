@@ -1,0 +1,22 @@
+{
+  "duration": 29.0,
+  "fps": 30,
+  "marks": {
+    "moon": 0.1, "title": 0.45, "hookOut": 2.6, "ipadIn": 2.55,
+    "s1": 3.0, "lens1Up": 4.5, "lens1Back": 6.9, "s1End": 8.0,
+    "s2": 8.0, "tap2": 8.9, "card": 9.0, "lens2Up": 9.8, "lens2Back": 12.2, "s2End": 13.2,
+    "s3": 13.2, "player": 13.5, "lens3Up": 14.3, "lens3Back": 16.3, "s3End": 17.2,
+    "s4": 17.2, "night": 17.8, "s4End": 20.6,
+    "s5": 20.6, "tap5": 21.2, "sheet": 21.6, "lens5Up": 22.3, "lens5Back": 24.4, "s5End": 25.2,
+    "ipadOut": 25.0, "cta": 25.6
+  },
+  "sfx": [
+    ["chime", "moon"], ["whoosh", "ipadIn"],
+    ["lift", "lens1Up"], ["drop", "lens1Back"],
+    ["tap", "tap2"], ["pop", "card"], ["lift", "lens2Up"], ["drop", "lens2Back"],
+    ["pluck", "player"], ["lift", "lens3Up"], ["drop", "lens3Back"],
+    ["shimmer", "night"],
+    ["tap", "tap5"], ["pop", "sheet"], ["lift", "lens5Up"], ["drop", "lens5Back"],
+    ["whoosh", "ipadOut"], ["chime", "cta"]
+  ]
+}
