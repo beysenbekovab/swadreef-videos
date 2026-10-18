@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Qamar — Мусхаф (Reel)</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  :root {
+    /* Тема «лунная ночь»: глубокий индиго + лунное золото */
+    --bg-0: #070B22;
+    --bg-1: #121A45;
+    --accent: #E9C46A;
+    --accent-soft: rgba(233, 196, 106, .22);
+    --text: #F5F1E6;
+    --muted: rgba(245, 241, 230, .62);
+    --paper: #FBF6EA;
+    --ink: #1D1A14;
+    --frame: #B98E3B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg-0); }
+  body { font-family: 'Manrope', sans-serif; color: var(--text); }
+
+  #stage { position: absolute; inset: 0; overflow: hidden;
+    background: radial-gradient(120% 70% at 50% 18%, var(--bg-1) 0%, var(--bg-0) 62%); }
+  #stars { position: absolute; inset: 0; }
+  .star { position: absolute; border-radius: 50%; background: #fff; }
+  #glow { position: absolute; width: 1400px; height: 1400px; left: -160px; top: 300px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(233,196,106,.16) 0%, rgba(233,196,106,0) 60%); }
+
+  /* ---------- Хук / CTA ---------- */
+  .center-block { position: absolute; left: 0; right: 0; text-align: center; }
+  #hook { top: 520px; }
+  #moon { display: block; margin: 0 auto 56px; }
+  .kicker { font-size: 30px; letter-spacing: .32em; font-weight: 700; color: var(--accent); }
+  .headline { margin-top: 28px; font-size: 92px; line-height: 1.05; font-weight: 800; letter-spacing: -.02em; }
+  .headline em { font-style: normal; color: var(--accent); }
+  .sub { margin-top: 30px; font-size: 36px; color: var(--muted); font-weight: 500; }
+
+  /* ---------- Подписи фич ---------- */
+  #caption { position: absolute; left: 80px; right: 80px; top: 230px; height: 250px; }
+  .cap { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; }
+  .cap .num { display: inline-flex; align-self: flex-start; align-items: center; gap: 14px;
+    font-size: 26px; font-weight: 800; letter-spacing: .18em; color: var(--accent); }
+  .cap .num::before { content: ''; width: 46px; height: 3px; background: var(--accent); border-radius: 2px; }
+  .cap h2 { margin-top: 16px; font-size: 64px; line-height: 1.08; font-weight: 800; letter-spacing: -.015em; }
+
+  /* ---------- iPad ---------- */
+  #ipad-wrap { position: absolute; left: 190px; top: 540px; width: 700px; height: 980px; transform-origin: 50% 50%; }
+  #ipad { position: absolute; inset: 0; border-radius: 58px; background: linear-gradient(145deg,#2b2f3d,#0d0f16);
+    padding: 22px; box-shadow: 0 60px 120px rgba(0,0,0,.55), 0 0 0 2px rgba(255,255,255,.08) inset; }
+  #screen { position: relative; width: 100%; height: 100%; border-radius: 38px; overflow: hidden; background: var(--paper); }
+  #shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; z-index: 30; }
+
+  /* интерфейс приложения */
+  .topbar { position: absolute; left: 0; right: 0; top: 0; height: 84px; display: flex; align-items: center;
+    justify-content: space-between; padding: 22px 30px 0; font-size: 19px; font-weight: 700; color: var(--ink); opacity: .75; }
+  .topbar .ar { font-family: 'Amiri', serif; font-size: 26px; font-weight: 700; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px;
+    background: color-mix(in srgb, var(--ink) 8%, transparent); }
+
+  #page { position: absolute; left: 34px; right: 34px; top: 96px; bottom: 70px; border-radius: 10px;
+    border: 3px solid var(--frame); box-shadow: 0 0 0 7px var(--paper), 0 0 0 9px color-mix(in srgb, var(--frame) 55%, transparent);
+    padding: 44px 34px 30px; display: flex; flex-direction: column; align-items: center; }
+  .surah-head { width: 100%; height: 76px; border-radius: 40px; border: 2px solid var(--frame);
+    display: flex; align-items: center; justify-content: center; position: relative;
+    background: color-mix(in srgb, var(--frame) 10%, transparent); }
+  .surah-head::before, .surah-head::after { content: '۞'; position: absolute; top: 50%; transform: translateY(-50%);
+    color: var(--frame); font-size: 30px; font-family: 'Amiri', serif; }
+  .surah-head::before { left: 26px; } .surah-head::after { right: 26px; }
+  .surah-head span { font-family: 'Amiri', serif; font-weight: 700; font-size: 38px; color: var(--ink); }
+  .quran { direction: rtl; flex: 1; display: flex; align-items: center; margin-top: 10px; padding-bottom: 30px; font-family: 'Amiri Quran', serif; font-size: 43px; line-height: 2.05;
+    text-align: center; color: var(--ink); }
+  .ayah { border-radius: 14px; padding: 0 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  .an { display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; margin: 0 6px;
+    vertical-align: middle; border-radius: 50%; border: 2px solid var(--frame); font-family: 'Amiri', serif;
+    font-size: 25px; line-height: 1; color: var(--ink); position: relative; top: -4px; }
+  .page-no { position: absolute; bottom: 22px; left: 0; right: 0; text-align: center; font-family: 'Amiri', serif;
+    font-size: 24px; color: var(--ink); opacity: .6; }
+
+  /* закладка */
+  #ribbon { position: absolute; right: 70px; top: 0; width: 48px; height: 120px; background: var(--accent); z-index: 5;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%); }
+
+  /* нижняя шторка перевода */
+  #sheet { position: absolute; left: 0; right: 0; bottom: 0; height: 370px; z-index: 10; background: #fff;
+    border-radius: 34px 34px 0 0; box-shadow: 0 -20px 60px rgba(0,0,0,.18); padding: 18px 34px 30px; color: #1D1A14; }
+  #sheet .grab { width: 70px; height: 7px; border-radius: 4px; background: #d9d4c8; margin: 0 auto 22px; }
+  #sheet .tabs { display: flex; gap: 10px; }
+  #sheet .tab { padding: 10px 20px; border-radius: 999px; font-size: 19px; font-weight: 700; background: #f2eee4; color: #6d6555; }
+  #sheet .tab.on { background: #1D1A14; color: #F5E3B0; }
+  #sheet .ref { margin-top: 22px; font-size: 18px; font-weight: 800; letter-spacing: .14em; color: #a37a26; }
+  #sheet .ar { direction: rtl; margin-top: 10px; font-family: 'Amiri Quran', serif; font-size: 38px; line-height: 1.9; }
+  #sheet .tr { margin-top: 8px; font-size: 29px; line-height: 1.45; font-weight: 500; color: #3a3428; }
+
+  /* аудиоплеер */
+  #player { position: absolute; left: 22px; right: 22px; bottom: 22px; height: 112px; z-index: 10; border-radius: 28px;
+    background: #14193A; color: #F5F1E6; display: flex; align-items: center; gap: 18px; padding: 0 22px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.35); }
+  #player .play { width: 64px; height: 64px; border-radius: 50%; background: var(--accent); flex: none;
+    display: flex; align-items: center; justify-content: center; }
+  #player .meta { flex: none; width: 210px; }
+  #player .meta b { display: block; font-size: 20px; } #player .meta span { font-size: 16px; color: var(--muted); }
+  #wave { flex: 1; height: 56px; display: flex; align-items: center; gap: 4px; }
+  #wave i { flex: 1; border-radius: 3px; background: var(--accent); }
+
+  /* тост */
+  #toast { position: absolute; left: 50%; top: 110px; z-index: 12; padding: 16px 26px; border-radius: 999px;
+    background: #14193A; color: #F5F1E6; font-size: 21px; font-weight: 700; white-space: nowrap;
+    display: flex; align-items: center; gap: 12px; box-shadow: 0 14px 40px rgba(0,0,0,.3); }
+
+  /* переключатель ночного режима */
+  #toggle { position: absolute; left: 26px; top: 112px; z-index: 12; width: 92px; height: 50px; border-radius: 999px;
+    background: #d8d0bd; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+  #toggle .knob { position: absolute; top: 5px; left: 5px; width: 40px; height: 40px; border-radius: 50%;
+    background: #fff; display: flex; align-items: center; justify-content: center; }
+
+  /* палец */
+  #tap { position: absolute; width: 110px; height: 110px; margin: -55px 0 0 -55px; z-index: 20; pointer-events: none; }
+  #tap .dot { position: absolute; inset: 25px; border-radius: 50%; background: rgba(255,255,255,.85);
+    box-shadow: 0 6px 24px rgba(0,0,0,.25); }
+  #tap .ring { position: absolute; inset: 0; border-radius: 50%; border: 4px solid rgba(255,255,255,.9); }
+
+  /* CTA */
+  #cta { top: 560px; }
+  .brand { font-size: 128px; font-weight: 800; letter-spacing: -.03em; }
+  .store { display: inline-flex; align-items: center; gap: 18px; margin-top: 54px; padding: 26px 46px; border-radius: 26px;
+    background: var(--text); color: var(--bg-0); font-size: 36px; font-weight: 800; }
+  .store small { display: block; font-size: 20px; font-weight: 600; opacity: .7; text-align: left; }
+  .handle { margin-top: 34px; font-size: 30px; color: var(--muted); font-weight: 600; }
+
+  /* прогресс */
+  #dots { position: absolute; left: 0; right: 0; top: 1585px; display: flex; justify-content: center; gap: 14px; }
+  #dots i { width: 14px; height: 14px; border-radius: 7px; background: rgba(245,241,230,.25); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="glow"></div>
+  <div id="stars"></div>
+
+  <div id="hook" class="center-block">
+    <svg id="moon" width="170" height="170" viewBox="0 0 100 100">
+      <defs><mask id="cres"><rect width="100" height="100" fill="#fff"/><circle id="moon-cut" cx="66" cy="38" r="36" fill="#000"/></mask></defs>
+      <circle cx="50" cy="50" r="40" fill="#E9C46A" mask="url(#cres)"/>
+    </svg>
+    <div class="kicker" data-k="hook.kicker"></div>
+    <div class="headline" data-k="hook.title"></div>
+    <div class="sub" data-k="hook.sub"></div>
+  </div>
+
+  <div id="caption"></div>
+
+  <div id="ipad-wrap">
+    <div id="ipad">
+      <div id="screen">
+        <div class="topbar">
+          <span class="pill">‹&nbsp; <span data-k="ui.back"></span></span>
+          <span class="ar">الفاتحة</span>
+          <span class="pill" data-k="ui.juz"></span>
+        </div>
+        <div id="ribbon"></div>
+        <div id="page">
+          <div class="surah-head"><span>سورة الفاتحة</span></div>
+          <div class="quran" id="quran"></div>
+          <div class="page-no">١</div>
+        </div>
+
+        <div id="toggle"><div class="knob">
+          <svg width="24" height="24" viewBox="0 0 24 24"><path id="toggle-icon" fill="#E9C46A"
+            d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>
+        </div></div>
+
+        <div id="toast">
+          <svg width="22" height="26" viewBox="0 0 22 26"><path d="M2 1h18v24l-9-6-9 6z" fill="#E9C46A"/></svg>
+          <span data-k="ui.bookmarkToast"></span>
+        </div>
+
+        <div id="sheet">
+          <div class="grab"></div>
+          <div class="tabs">
+            <span class="tab on" data-k="ui.tabTranslation"></span>
+            <span class="tab" data-k="ui.tabTafsir"></span>
+            <span class="tab" data-k="ui.tabWords"></span>
+          </div>
+          <div class="ref" id="sheet-ref"></div>
+          <div class="ar" id="sheet-ar"></div>
+          <div class="tr" id="sheet-tr"></div>
+        </div>
+
+        <div id="player">
+          <div class="play"><svg width="26" height="26" viewBox="0 0 26 26"><rect x="5" y="3" width="6" height="20" rx="2" fill="#14193A"/><rect x="15" y="3" width="6" height="20" rx="2" fill="#14193A"/></svg></div>
+          <div class="meta"><b data-k="ui.reciter"></b><span id="player-ayah"></span></div>
+          <div id="wave"></div>
+        </div>
+
+        <img id="shot" alt="">
+        <div id="tap"><div class="ring"></div><div class="dot"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cta" class="center-block">
+    <svg width="150" height="150" viewBox="0 0 100 100" style="display:block;margin:0 auto 26px">
+      <defs><mask id="cres2"><rect width="100" height="100" fill="#fff"/><circle cx="66" cy="38" r="36" fill="#000"/></mask></defs>
+      <circle cx="50" cy="50" r="40" fill="#E9C46A" mask="url(#cres2)"/>
+    </svg>
+    <div class="brand">Qamar</div>
+    <div class="sub" data-k="cta.sub"></div>
+    <div class="store">
+      <svg width="40" height="48" viewBox="0 0 384 512"><path fill="currentColor" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+      <span><small data-k="cta.storeSmall"></small><span data-k="cta.store"></span></span>
+    </div>
+    <div class="handle" data-k="cta.handle"></div>
+  </div>
+
+  <div id="dots"></div>
+</div>
+
+<script>
+/* =====================================================================
+   КОНФИГ — всё, что нужно поменять, находится здесь.
+   ===================================================================== */
+const CONFIG = {
+  fps: 30,
+  duration: 24,
+  text: {
+    hook: { kicker: 'QAMAR · МУСХАФ', title: 'Коран, который<br>хочется <em>открывать</em>', sub: 'Показываем, что умеет мусхаф в Qamar' },
+    ui: { back: 'Суры', juz: 'Джуз 1', bookmarkToast: 'Закладка сохранена', tabTranslation: 'Перевод',
+          tabTafsir: 'Тафсир', tabWords: 'По словам', reciter: 'Мишари аль-Афаси' },
+    cta: { sub: 'Мусхаф всегда с тобой', storeSmall: 'Загрузите в', store: 'App Store', handle: 'Ссылка в профиле ↑' },
+  },
+  // Фичи мусхафа. Порядок = порядок в ролике. Сцены (mode): page | tap | audio | bookmark | night
+  features: [
+    { mode: 'page',     title: 'Страницы как<br>в бумажном мусхафе' },
+    { mode: 'tap',      title: 'Нажми на аят —<br>перевод и тафсир' },
+    { mode: 'audio',    title: 'Слушай чтеца —<br>аят подсвечивается' },
+    { mode: 'bookmark', title: 'Закладки: продолжай<br>с того же места' },
+    { mode: 'night',    title: 'Ночной режим<br>для чтения перед сном' },
+  ],
+  // Реальные скриншоты с iPad (необязательно). Путь к файлу в папке screenshots/.
+  // Если указан — показывается поверх макета в соответствующей сцене.
+  screenshots: { page: null, tap: null, audio: null, bookmark: null, night: null },
+};
+
+// Сура аль-Фатиха (1:1–7) и смысловой перевод Кулиева
+const AYAT = [
+  ['بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ', 'Во имя Аллаха, Милостивого, Милосердного!'],
+  ['ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ', 'Хвала Аллаху, Господу миров,'],
+  ['ٱلرَّحْمَٰنِ ٱلرَّحِيمِ', 'Милостивому, Милосердному,'],
+  ['مَٰلِكِ يَوْمِ ٱلدِّينِ', 'Властелину Дня воздаяния!'],
+  ['إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ', 'Тебе одному мы поклоняемся и Тебя одного молим о помощи.'],
+  ['ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ', 'Веди нас прямым путем,'],
+  ['صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ',
+   'путем тех, кого Ты облагодетельствовал, не тех, на кого пал гнев, и не заблудших.'],
+];
+const AR_DIGITS = '٠١٢٣٤٥٦٧٨٩';
+const arNum = n => String(n).replace(/\d/g, d => AR_DIGITS[d]);
+
+/* ---------- Таймлайн ---------- */
+const HOOK_END = 2.8, CTA_LEN = 3.2;
+const FEAT_LEN = (CONFIG.duration - HOOK_END - CTA_LEN) / CONFIG.features.length;
+const CTA_START = CONFIG.duration - CTA_LEN;
+
+/* ---------- Утилиты анимации ---------- */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, k) => a + (b - a) * k;
+const easeOut = k => 1 - Math.pow(1 - k, 3);
+const easeInOut = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const backOut = k => { const c = 1.7; return 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); };
+const mixHex = (a, b, k) => {
+  const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const [x, y] = [p(a), p(b)];
+  return '#' + x.map((v, i) => Math.round(lerp(v, y[i], k)).toString(16).padStart(2, '0')).join('');
+};
+const $ = s => document.querySelector(s);
+const css = (el, o) => Object.assign(el.style, o);
+
+/* ---------- Построение DOM ---------- */
+function build() {
+  document.querySelectorAll('[data-k]').forEach(el => {
+    el.innerHTML = el.dataset.k.split('.').reduce((o, k) => o[k], CONFIG.text);
+  });
+  $('#quran').innerHTML = '<div>' + AYAT.map(([a], i) =>
+    `<span class="ayah" data-i="${i}">${a}</span><span class="an">${arNum(i + 1)}</span> `).join('') + '</div>';
+
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const stars = $('#stars');
+  for (let i = 0; i < 90; i++) {
+    const s = document.createElement('div'); s.className = 'star';
+    const r = 1 + rnd() * 2.6;
+    css(s, { left: rnd() * 1080 + 'px', top: rnd() * 1920 + 'px', width: r + 'px', height: r + 'px' });
+    s.dataset.ph = rnd() * 6.28; s.dataset.sp = .6 + rnd() * 1.6;
+    stars.appendChild(s);
+  }
+  $('#wave').innerHTML = '<i></i>'.repeat(26);
+  $('#caption').innerHTML = CONFIG.features.map((f, i) =>
+    `<div class="cap"><span class="num">${String(i + 1).padStart(2, '0')}</span><h2>${f.title}</h2></div>`).join('');
+  $('#dots').innerHTML = '<i></i>'.repeat(CONFIG.features.length);
+}
+
+/* ---------- Кадр ---------- */
+function renderFrame(t) {
+  // звёзды
+  document.querySelectorAll('.star').forEach(s =>
+    s.style.opacity = .25 + .55 * (.5 + .5 * Math.sin(t * s.dataset.sp + +s.dataset.ph)));
+  css($('#glow'), { transform: `translateY(${Math.sin(t * .5) * 30}px)` });
+
+  // --- хук
+  const hIn = easeOut(prog(t, 0, .9)), hOut = easeInOut(prog(t, HOOK_END - .5, HOOK_END));
+  css($('#hook'), { opacity: hIn * (1 - hOut), transform: `translateY(${(1 - hIn) * 60 - hOut * 140}px)` });
+  $('#moon-cut').setAttribute('cx', lerp(110, 66, easeOut(prog(t, .1, 1.4))));
+  $('#moon').style.transform = `rotate(${lerp(-30, 0, easeOut(prog(t, 0, 1.4)))}deg)`;
+
+  // --- iPad: въезд снизу и выезд к CTA
+  const inK = backOut(prog(t, HOOK_END - .35, HOOK_END + .75));
+  const outK = easeInOut(prog(t, CTA_START - .2, CTA_START + .6));
+  const tilt = lerp(14, 0, easeOut(prog(t, HOOK_END - .35, HOOK_END + 1)));
+  const breath = 1 + .012 * Math.sin(t * 1.3);
+  css($('#ipad-wrap'), {
+    transform: `perspective(2400px) translateY(${(1 - inK) * 1300 + outK * 1400}px) rotateX(${tilt}deg) scale(${breath * lerp(1, .8, outK)})`,
+    opacity: t < HOOK_END - .4 ? 0 : 1,
+  });
+
+  // --- текущая фича
+  const ft = t - HOOK_END;
+  const fi = clamp(Math.floor(ft / FEAT_LEN), 0, CONFIG.features.length - 1);
+  const lt = ft - fi * FEAT_LEN;               // локальное время фичи
+  const mode = t >= HOOK_END && t < CTA_START ? CONFIG.features[fi].mode : null;
+
+  // подписи
+  document.querySelectorAll('.cap').forEach((c, i) => {
+    const a = HOOK_END + i * FEAT_LEN, b = a + FEAT_LEN;
+    const kin = easeOut(prog(t, a + .1, a + .6)), kout = easeInOut(prog(t, b - .3, b));
+    css(c, { opacity: kin * (1 - kout), transform: `translateX(${(1 - kin) * 80 - kout * 80}px)` });
+  });
+  document.querySelectorAll('#dots i').forEach((d, i) => {
+    const on = mode && i === fi;
+    css(d, { width: on ? '44px' : '14px', background: on ? 'var(--accent)' : (mode && i < fi ? 'rgba(233,196,106,.55)' : 'rgba(245,241,230,.25)') });
+  });
+  $('#dots').style.opacity = t >= HOOK_END && t < CTA_START ? 1 : 0;
+
+  // ---- состояние экрана по умолчанию
+  const ayahs = document.querySelectorAll('.ayah');
+  ayahs.forEach(a => a.style.background = 'transparent');
+  let sheet = 0, player = 0, ribbon = 0, toast = 0, toggle = 0, night = 0, tap = null;
+
+  const at = (m) => CONFIG.features.findIndex(f => f.mode === m);
+  const localFor = m => { const i = at(m); return i < 0 ? -1 : t - HOOK_END - i * FEAT_LEN; };
+
+  // ночной режим держим после его сцены
+  const nl = localFor('night');
+  if (nl >= 0) night = easeInOut(prog(nl, .85, 1.15));
+
+  if (mode === 'page') {
+    // лёгкий «перелист»: страница выезжает
+    const k = easeOut(prog(lt, .0, .8));
+    $('#page').style.transform = `translateX(${(1 - k) * -120}px)`;
+    $('#page').style.opacity = k;
+  } else { $('#page').style.transform = 'none'; $('#page').style.opacity = 1; }
+
+  if (mode === 'tap') {
+    const idx = 1;
+    tap = { el: ayahs[idx], k: lt, at: .55 };
+    const hl = easeOut(prog(lt, .6, 1.0));
+    ayahs[idx].style.background = `rgba(233,196,106,${.42 * hl})`;
+    sheet = easeOut(prog(lt, .95, 1.6)) * (1 - easeInOut(prog(lt, FEAT_LEN - .35, FEAT_LEN)));
+    $('#sheet-ref').textContent = 'АЛЬ-ФАТИХА · 1:' + (idx + 1);
+    $('#sheet-ar').textContent = AYAT[idx][0];
+    $('#sheet-tr').textContent = AYAT[idx][1];
+  }
+
+  if (mode === 'audio') {
+    player = easeOut(prog(lt, .1, .6)) * (1 - easeInOut(prog(lt, FEAT_LEN - .3, FEAT_LEN)));
+    const per = (FEAT_LEN - .7) / 4;
+    const cur = clamp(Math.floor((lt - .5) / per), 0, 3);
+    const k = easeOut(prog((lt - .5) - cur * per, 0, .25));
+    ayahs[cur].style.background = `rgba(233,196,106,${.42 * (lt > .5 ? k : 0)})`;
+    if (cur > 0) ayahs[cur - 1].style.background = `rgba(233,196,106,${.42 * (1 - k)})`;
+    $('#player-ayah').textContent = 'Аль-Фатиха · аят ' + (cur + 1);
+    document.querySelectorAll('#wave i').forEach((b, i) => {
+      const h = 10 + 40 * Math.abs(Math.sin(t * 7 + i * .9) * Math.cos(t * 3.1 + i * .37));
+      b.style.height = h + 'px';
+    });
+  }
+
+  if (mode === 'bookmark') {
+    tap = { el: $('#ribbon'), k: lt, at: .5, fixed: { x: 562, y: 80 } };
+    ribbon = backOut(prog(lt, .6, 1.1));
+    toast = easeOut(prog(lt, .9, 1.3)) * (1 - easeInOut(prog(lt, FEAT_LEN - .6, FEAT_LEN - .2)));
+  } else if (CONFIG.features.findIndex(f => f.mode === 'bookmark') < fi || t >= CTA_START) {
+    ribbon = 1;   // закладка остаётся
+  }
+
+  if (mode === 'night') {
+    toggle = easeOut(prog(lt, .1, .5)) * (1 - easeInOut(prog(lt, FEAT_LEN - .35, FEAT_LEN)));
+    tap = { el: $('#toggle'), k: lt, at: .75 };
+  }
+
+  // применяем
+  css($('#sheet'), { transform: `translateY(${(1 - sheet) * 110}%)` });
+  css($('#player'), { transform: `translateY(${(1 - player) * 160}px)`, opacity: player });
+  css($('#ribbon'), { transform: `translateY(${(ribbon - 1) * 120}px)` });
+  css($('#toast'), { opacity: toast, transform: `translate(-50%, ${(1 - toast) * -30}px)` });
+  css($('#toggle'), { opacity: toggle, transform: `scale(${lerp(.7, 1, toggle)})` });
+  $('#toggle .knob').style.transform = `translateX(${42 * night}px)`;
+  $('#toggle').style.background = mixHex('#d8d0bd', '#14193A', night);
+
+  // цвета страницы: день → ночь
+  const root = document.documentElement.style;
+  root.setProperty('--paper', mixHex('#FBF6EA', '#0F1330', night));
+  root.setProperty('--ink', mixHex('#1D1A14', '#EDE3C8', night));
+  root.setProperty('--frame', mixHex('#B98E3B', '#E9C46A', night));
+
+  // палец
+  const tapEl = $('#tap');
+  if (tap) {
+    const scr = $('#screen').getBoundingClientRect(), sc = scr.width / $('#screen').offsetWidth;
+    let x, y;
+    if (tap.fixed) ({ x, y } = tap.fixed);
+    else { const r = tap.el.getClientRects()[0] || tap.el.getBoundingClientRect();
+      x = (r.left + r.width / 2 - scr.left) / sc; y = (r.top + r.height / 2 - scr.top) / sc; }
+    const appear = easeOut(prog(tap.k, tap.at - .35, tap.at - .05));
+    const press = prog(tap.k, tap.at, tap.at + .15);
+    const gone = prog(tap.k, tap.at + .45, tap.at + .7);
+    const ring = prog(tap.k, tap.at, tap.at + .5);
+    css(tapEl, { left: x + 'px', top: (y + (1 - appear) * 60) + 'px', opacity: appear * (1 - gone) });
+    css(tapEl.querySelector('.dot'), { transform: `scale(${1 - .2 * Math.sin(Math.PI * press)})` });
+    css(tapEl.querySelector('.ring'), { transform: `scale(${.5 + ring * .9})`, opacity: tap.k >= tap.at ? 1 - ring : 0 });
+  } else tapEl.style.opacity = 0;
+
+  // реальные скриншоты поверх макета (если заданы)
+  const shot = $('#shot'), src = mode && CONFIG.screenshots[mode];
+  if (src) {
+    if (shot.getAttribute('src') !== src) shot.setAttribute('src', src);
+    shot.style.opacity = easeOut(prog(lt, 0, .35)) * (1 - easeInOut(prog(lt, FEAT_LEN - .3, FEAT_LEN)));
+    shot.style.transform = `scale(${1 + .04 * lt / FEAT_LEN})`;
+  } else shot.style.opacity = 0;
+
+  // --- CTA
+  const cIn = easeOut(prog(t, CTA_START + .25, CTA_START + 1.1));
+  css($('#cta'), { opacity: cIn, transform: `translateY(${(1 - cIn) * 70}px)` });
+}
+
+build();
+window.CONFIG = CONFIG;
+window.renderFrame = renderFrame;
+window.ready = document.fonts.ready.then(async () => {
+  await Promise.all([...document.querySelectorAll('img[src]')].map(i => i.decode().catch(() => {})));
+  renderFrame(0);
+  return true;
+});
+// предпросмотр в браузере: index.html?play
+if (location.search.includes('play')) {
+  const t0 = performance.now();
+  const loop = () => { renderFrame(((performance.now() - t0) / 1000) % CONFIG.duration); requestAnimationFrame(loop); };
+  window.ready.then(loop);
+}
+</script>
+</body>
+</html>
